@@ -1,4 +1,4 @@
-﻿Shader "Custom/Voronoi" {
+﻿Shader "Custom/Billboard" {
 
 	Properties{
 		_Size("Size", Range(0, 10)) = 1
@@ -24,10 +24,10 @@
 		};
 
 		struct g2f {
-			float4 pos : POSITION;
+			float4 pos : SV_POSITION;
 		};
 
-		v2g vert(appdata IN, uint id : SV_VertexID) {
+		v2g vert(appdata IN) {
 			v2g OUT;
 
 			OUT.vertex = IN.vertex;
@@ -41,23 +41,18 @@
 			float size = _Size;
 			float halfS = 0.5f * size;
 
-			float4x4 vp = UNITY_MATRIX_VP;
-
 			g2f pIn;
 
 			for (int x = 0; x < 2; x++) {
 				for (int y = 0; y < 2; y++) {
 					float4x4 billboardMatrix = UNITY_MATRIX_V;
-					billboardMatrix._m03 =
-						billboardMatrix._m13 =
-						billboardMatrix._m23 =
-						billboardMatrix._m33 = 0;
+					billboardMatrix._m03 = billboardMatrix._m13 = billboardMatrix._m23 = billboardMatrix._m33 = 0;
 
 					float2 uv = float2(x, y);
 
 					pIn.pos = IN[0].vertex + mul(float4((uv * 2 - float2(1, 1)) * halfS, 0, 1), billboardMatrix);
 
-					pIn.pos = mul(vp, pIn.pos);
+					pIn.pos = mul(UNITY_MATRIX_VP, pIn.pos);
 
 					OUT.Append(pIn);
 				}

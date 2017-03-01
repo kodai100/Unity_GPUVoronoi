@@ -6,11 +6,16 @@ public class Voronoi : MonoBehaviour {
 
     public Material material;
     public int num;
-    public float radius;
+    public float width;
 
     void Start () {
+        CreateMesh();
+    }
+
+    void CreateMesh() {
         var mesh = new Mesh();
-        mesh.vertices = MakeRandomPointsInSphere(num, radius);
+        mesh.vertices = MakeRandomPointsInSquare(num, width);
+        mesh.uv = MakeColorIndex(num);
 
         var filter = GetComponent<MeshFilter>();
         filter.sharedMesh = mesh;
@@ -20,12 +25,28 @@ public class Voronoi : MonoBehaviour {
         renderer.material = material;
     }
 
-    Vector3[] MakeRandomPointsInSphere(int n, float rad) {
+    void Update() {
+
+    }
+
+    void OnRenderObject() {
+        // Graphics.DrawProcedural(MeshTopology.Points, num);
+    }
+
+    Vector3[] MakeRandomPointsInSquare(int n, float width) {
         Vector3[] points = new Vector3[n];
-        for(int i = 0; i<points.Length; i++) {
-            points[i] = rad * Random.insideUnitSphere;
+        for (int i = 0; i < points.Length; i++) {
+            points[i] = new Vector3(Random.Range(-width / 2, width / 2), Random.Range(-width / 2, width / 2), 0f);
         }
         return points;
+    }
+
+    Vector2[] MakeColorIndex(int n) {
+        Vector2[] uvs = new Vector2[n];
+        for (int i = 0; i < uvs.Length; i++) {
+            uvs[i] = new Vector2((float)i/uvs.Length, 1);
+        }
+        return uvs;
     }
 	
     int[] MakeSequencialIndices(int n) {
@@ -34,14 +55,6 @@ public class Voronoi : MonoBehaviour {
             indices[i] = i;
         }
         return indices;
-    }
-
-	void Update () {
-		
-	}
-
-    void OnRenderObject() {
-        // Graphics.DrawProcedural(MeshTopology.Points, num);
     }
     
 }
